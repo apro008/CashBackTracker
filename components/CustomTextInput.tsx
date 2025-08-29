@@ -1,19 +1,31 @@
-import { TextInput, StyleSheet } from 'react-native';
+import React from 'react';
+import { TextInput, StyleSheet, TextInputProps, StyleProp, TextStyle } from 'react-native';
+
+type CustomTextInputProps = TextInputProps & {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  secureTextEntry?: boolean;
+  style?: StyleProp<TextStyle>; // allow extending styles
+};
 
 export default function CustomTextInput({
   value,
   onChangeText,
   placeholder,
   secureTextEntry = false,
-}) {
+  style,
+  ...rest
+}: CustomTextInputProps) {
   return (
     <TextInput
-      style={styles.input}
+      style={[styles.input, style]}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
       secureTextEntry={secureTextEntry}
       autoCapitalize="none"
+      {...rest}
     />
   );
 }

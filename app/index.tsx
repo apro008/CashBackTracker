@@ -4,7 +4,7 @@ import { useAuthStore } from '~/store/useAuthStore';
 export default function Index() {
   const { user, loading } = useAuthStore();
 
-  if (loading) return null; // TODO: show Splash/loader
+  if (loading) return null; // show Splash if you want
 
   return user ? <Redirect href="/(app)/(tabs)" /> : <Redirect href="/(auth)/login" />;
 }

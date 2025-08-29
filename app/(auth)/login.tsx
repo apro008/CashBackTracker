@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useAuthStore } from '~/store/useAuthStore';
 import { Button } from '~/components/Button';
 import CustomTextInput from '~/components/CustomTextInput';
@@ -9,11 +9,13 @@ export default function LoginScreen() {
   const { login, error } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const onSubmit = async () => {
     if (!/^\S+@\S+\.\S+$/.test(email)) return Alert.alert('Invalid email');
     if (password.length < 6) return Alert.alert('Password too short');
-    await login(email.trim(), password);
+    const cred = await login(email, password);
+    if (cred) router.replace('/'); // triggers index.tsx gate
   };
 
   return (

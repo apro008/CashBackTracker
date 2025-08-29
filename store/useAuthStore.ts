@@ -1,23 +1,25 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { auth } from '~/utils/firebase';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
   User,
+  UserCredential,
 } from 'firebase/auth';
+import { auth } from '~/utils/firebase';
 import { mmkv } from '~/utils/storage';
 
 type AuthState = {
   user: User | null;
-  loading: boolean; // true until first onAuthStateChanged fires
+  loading: boolean;
   error: string | null;
   setUser: (u: User | null) => void;
   setLoading: (v: boolean) => void;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+  clearError: () => void;
+  login: (email: string, password: string) => Promise<UserCredential | void>;
+  signup: (email: string, password: string) => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -29,26 +31,46 @@ export const useAuthStore = create<AuthState>()(
       loading: true,
       error: null,
 
-      setUser: (u) => set({ user: u }),
+      setUser: (u) => {
+        console.log('[Zustand] setUser called with:', u?.uid ?? null);
+        set({ user: u });
+      },
       setLoading: (v) => set({ loading: v }),
+      clearError: () => set({ error: null }),
 
       login: async (email, password) => {
-        set({ error: null });
-        await signInWithEmailAndPassword(auth, email, password).catch((e) =>
-          set({ error: e.message })
-        );
+        set({ error: null, loading: true });
+        try {
+          const cred = await signInWithEmailAndPassword(auth, email, password);
+          console.log('cred signInWithEmailAndPassword', cred);
+          return cred; // user will be set by onAuthStateChanged in SessionProvider
+        } catch (e: any) {
+          set({ error: e.message });
+        } finally {
+          set({ loading: false });
+        }
       },
 
       signup: async (email, password) => {
-        set({ error: null });
-        await createUserWithEmailAndPassword(auth, email, password).catch((e) =>
-          set({ error: e.message })
-        );
+        set({ error: null, loading: true });
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          console.log('cred createUserWithEmailAndPassword', cred);
+          return cred;
+        } catch (e: any) {
+          set({ error: e.message });
+        } finally {
+          set({ loading: false });
+        }
       },
 
       resetPassword: async (email) => {
         set({ error: null });
-        await sendPasswordResetEmail(auth, email).catch((e) => set({ error: e.message }));
+        try {
+          await sendPasswordResetEmail(auth, email);
+        } catch (e: any) {
+          set({ error: e.message });
+        }
       },
 
       logout: async () => {
@@ -63,8 +85,8 @@ export const useAuthStore = create<AuthState>()(
         setItem: (k, v) => mmkv.set(k, v),
         removeItem: (k) => mmkv.delete(k),
       })),
-      // Only persist lightweight, non-circular bits
-      partialize: (s) => ({ user: s.user ? { uid: s.user.uid, email: s.user.email } : null }),
+      partialize: (s) =>
+        s.user ? { user: { uid: s.user.uid, email: s.user.email } } : { user: null },
     }
   )
 );
