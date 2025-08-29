@@ -12,7 +12,8 @@
     "plugins": ["expo-router", "expo-web-browser"],
     "experiments": {
       "typedRoutes": true,
-      "tsconfigPaths": true
+      "tsconfigPaths": true,
+      "turboModules": true
     },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
