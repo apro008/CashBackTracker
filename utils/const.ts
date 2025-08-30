@@ -1,0 +1,17 @@
+export const CATEGORIES = [
+  { key: 'food', label: 'Food', icon: '🍜' },
+  { key: 'social', label: 'Social Life', icon: '👥' },
+  { key: 'pets', label: 'Pets', icon: '🐶' },
+  { key: 'transport', label: 'Transport', icon: '🚕' },
+  { key: 'culture', label: 'Culture', icon: '🎨' },
+  { key: 'household', label: 'Household', icon: '🪑' },
+  { key: 'apparel', label: 'Apparel', icon: '🧥' },
+  { key: 'beauty', label: 'Beauty', icon: '💄' },
+  { key: 'health', label: 'Health', icon: '🧘‍♂️' },
+  { key: 'education', label: 'Education', icon: '📚' },
+  { key: 'gift', label: 'Gift', icon: '🎁' },
+  { key: 'other', label: 'Other', icon: '📦' },
+  { key: 'mobile', label: 'Mobile', icon: '📱' },
+  { key: 'amazon', label: 'Amazon', icon: '🛒' },
+  { key: 'invest', label: 'Invest', icon: '💰' },
+];
